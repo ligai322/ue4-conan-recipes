@@ -24,8 +24,11 @@ class GdalUe4Conan(ConanFile):
         self.requires("geos-ue4/3.6.3@adamrehn/{}".format(self.channel))
         self.requires("proj-ue4/4.9.3@adamrehn/{}".format(self.channel))
         self.requires("libcurl/ue4@adamrehn/{}".format(self.channel))
+        self.requires("OpenSSL/ue4@adamrehn/{}".format(self.channel))
+        self.requires("nghttp2/ue4@adamrehn/{}".format(self.channel))
         self.requires("UElibPNG/ue4@adamrehn/{}".format(self.channel))
         self.requires("zlib/ue4@adamrehn/{}".format(self.channel))
+        self.requires("LibJpegTurbo/ue4@adamrehn/{}".format(self.channel))
     
     def configure_flags(self):
         
@@ -138,6 +141,7 @@ class GdalUe4Conan(ConanFile):
         curl = self.deps_cpp_info["libcurl"]
         geos = self.deps_cpp_info["geos-ue4"]
         png = self.deps_cpp_info["UElibPNG"]
+        jpeg = self.deps_cpp_info["LibJpegTurbo"]
         proj = self.deps_cpp_info["proj-ue4"]
         zlib = self.deps_cpp_info["zlib"]
         
@@ -173,10 +177,19 @@ class GdalUe4Conan(ConanFile):
             ["\n#CURL_LIB = $(CURL_DIR)/libcurl.lib", "\nCURL_LIB = {}".format(Utility.resolve_file(curl.lib_paths[0], curl.libs[0]))],
             ["\n#CURL_CFLAGS = -DCURL_STATICLIB", "\nCURL_CFLAGS = -DCURL_STATICLIB"],
             
+             # libjpeg
+            ["\n#JPEG_EXTERNAL_LIB = 1", "\nJPEG12_SUPPORTED = 0 \nJPEG_SUPPORTED = 0\nJPEG_EXTERNAL_LIB = 1"],
+            ["\n#JPEGDIR = c:/projects/jpeg-6b", "\nJPEGDIR = {}".format(jpeg.include_paths[0])],    
+            ["\n#JPEG_LIB = $(JPEGDIR)/libjpeg.lib", "\nJPEG_LIB = {}".format(Utility.resolve_file(jpeg.lib_paths[0], jpeg.libs[0]))],
+            
             # libpng
             ["\n#PNG_EXTERNAL_LIB = 1", "\nPNG_EXTERNAL_LIB = 1"],
             ["\n#PNGDIR = c:/projects/libpng-1.0.8", "\nPNGDIR = {}".format(png.include_paths[0])],
             ["\n#PNG_LIB = $(PNGDIR)/libpng.lib", "\nPNG_LIB = {}".format(Utility.resolve_file(png.lib_paths[0], png.libs[0]))],
+            
+            
+         #   ["\n#if using an external jpeg library uncomment the following lines", "\nJPEG_SUPPORTED = 0\nJPEG12_SUPPORTED = 0\n#if using an external jpeg library uncomment the following lines"],
+                   
             
             # zlib
             ["\n#ZLIB_EXTERNAL_LIB = 1", "\nZLIB_EXTERNAL_LIB = 1"],
